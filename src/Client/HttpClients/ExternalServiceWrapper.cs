@@ -31,6 +31,7 @@ namespace Client.HttpClients
         private CircuitBreakerPolicy CreateCircuitBreakerPolicy()
             => Policy
                 .Handle<HttpRequestException>()
-                .CircuitBreakerAsync(FailAttempts, OpenCircuitDuration);
+                .CircuitBreakerAsync(FailAttempts, OpenCircuitDuration) ;
     }
 }
+
