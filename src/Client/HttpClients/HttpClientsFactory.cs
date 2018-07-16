@@ -1,21 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Autofac;
 using Client.Policies;
 
 namespace Client.HttpClients
 {
     public class HttpClientsFactory : IHttpClientsFactory
     {
-        public TClient Create<TClient>()
-        {
-            throw new NotImplementedException();
-        }
+        private readonly ILifetimeScope _lifetimeScope;
 
-        public TClient Create<TClient>(Func<ICustomPolicy> factory)
-        {
-            throw new NotImplementedException();
-        }
+        public HttpClientsFactory(ILifetimeScope lifetimeScope)
+            => _lifetimeScope = lifetimeScope;
+
+        public TClient Create<TClient>()
+            => _lifetimeScope.Resolve<TClient>(null);
+
+        public TClient Create<TClient>(Func<ICustomPolicyBuilder, ICustomPolicy> build)
+            => _lifetimeScope.Resolve<TClient>(new TypedParameter(typeof(ICustomPolicy), build(new CustomPolicyBuilder())));
     }
 }

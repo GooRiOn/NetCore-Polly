@@ -1,8 +1,11 @@
-﻿using Client.HttpClients;
+﻿using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Client.HttpClients;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace Client
 {
@@ -16,11 +19,18 @@ namespace Client
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IExternalService>(new ExternalServiceWrapper());
-
             services.AddMvc();
+
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.Populate(services);
+            containerBuilder.RegisterType<ExternalServiceWrapper>().As<IExternalService>().SingleInstance();
+            containerBuilder.RegisterType<HttpClientsFactory>().As<IHttpClientsFactory>();
+
+            var container = containerBuilder.Build();
+
+            return new AutofacServiceProvider(container);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

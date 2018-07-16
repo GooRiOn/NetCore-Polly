@@ -17,10 +17,13 @@ namespace Client.Policies
         {
             _circuitBreakerPolicy = Policy
                 .Handle<HttpRequestException>()
-                .CircuitBreaker(FailAttempts, OpenCircuitDuration);
+                .CircuitBreakerAsync(FailAttempts, OpenCircuitDuration);
         }
 
         public async Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> factory)
-            => await _circuitBreakerPolicy.ExecuteAsync(factory);        
+            => _circuitBreakerPolicy.CircuitState == CircuitState.Closed
+            ? await _circuitBreakerPolicy.ExecuteAsync(async () => await factory())
+            : await Task.FromResult(default(TResult));        
+
     }
 }

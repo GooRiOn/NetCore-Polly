@@ -11,8 +11,8 @@ namespace Client.Controllers
         private readonly IExternalService _externalService;
 
 
-        public ValuesController(IExternalService externalService)
-            => _externalService = externalService;
+        public ValuesController(IHttpClientsFactory factory)
+            => _externalService = factory.Create<IExternalService>(builder => builder.WithCircuitBreaker());
 
         [HttpGet]
         public async Task<IEnumerable<string>> GetValuesAsync()

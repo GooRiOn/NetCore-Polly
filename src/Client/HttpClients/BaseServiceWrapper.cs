@@ -12,6 +12,6 @@ namespace Client.HttpClients
             => _customPolicy = customPolicy;
 
         protected async Task<TResult> ExecuteAsync<TResult>(Func<Task<TResult>> factory)
-            => await _customPolicy.ExecuteAsync(factory);
+            => _customPolicy != null ? await  _customPolicy.ExecuteAsync(factory) : await factory();
     }
 }

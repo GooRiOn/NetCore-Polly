@@ -18,7 +18,7 @@ namespace Client.HttpClients
             => _externalService = RestClient.For<IExternalService>("http://localhost:5001");
 
         public async Task<IEnumerable<string>> GetValuesAsync()
-            => await ExecuteAsync(() => _externalService.GetValuesAsync());
+            => await ExecuteAsync(async () => await _externalService.GetValuesAsync());
     }
 }
 
